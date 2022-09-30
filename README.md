@@ -1,0 +1,322 @@
+# Appsmith Lightning Datasources
+
+We know that setting up Datasources in Appsmith is fast and easy, but sometimes setting up the services you want to connect to is not as easy.
+
+This project aims to provide fast and easy steps to set up such services so that you can get to hack around with Appsmith as soon as possible.
+
+## Notes
+
+- The deployment instructions provided here are not suited for production use, please use them for testing and POCs only.
+- If you are deploying this on an hosting provider you will need to use `Ngrok` to get a usable URL to connect to. If you use this locally just remember to use `localhost`.
+- Example how to get Ngrok host and port to make connections.
+```console
+appsmith@ngrok:~$ ngrok tcp 3306
+Session Status   
+online                                                                                   
+Account                       Appsmith-svg (Plan: Free)                                                                  
+Version                       3.1.0                                                                                     
+Region                        Europe (eu)                                                                               
+Latency                       164ms                                                                                    
+Web Interface                 http://127.0.0.1:4040                                                                     
+Forwarding                    tcp://0.tcp.eu.ngrok.io:16696 -> localhost:3306 
+Connections                  
+ttl     opn     rt1     rt5     p50     p90                                                                            
+0       0       0.00    0.00    0.00    0.00                                                                                 
+```
+
+- For example, the host and the port to make that connection would be.
+
+`host: 0.tcp.eu.ngrok.io`
+`port: 16696`
+
+## General Requirements
+
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Ngrok](https://ngrok.com/)
+
+
+## Service Setup
+
+### 🌿 MongoDB
+
+1. Copy the provided `docker-compose.yaml` [for MongoDB](MongoDB/docker-compose.yaml).
+
+```yaml
+version: '3.1'
+services:
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: mongodb
+    ports:
+      - "27017:27017"
+```
+
+2. Run the deployment. 
+
+```bash
+docker-compose up -d docker-compose.yaml
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+
+```bash
+ngrok tcp 27017
+```
+4. Follow our guide to create a [MongoDB Datasource](https://docs.appsmith.com/reference/datasources/querying-mongodb).
+    - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+
+5. Happy hacking!
+
+
+### 🐬 MySQL
+
+1. Copy the provided `docker-compose.yaml` [for MySQL](Mysql/docker-compose.yaml).
+```yaml
+version: '3.3'
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'mysql'
+      MYSQL_PASSWORD: 'mysql'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+volumes:
+  my-db:
+```
+2. Run the deployment. 
+
+```bash
+docker-compose up -d docker-compose.yaml
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+
+```bash
+ngrok tcp 3306
+```
+4. Follow our guide to create a [MySQL Datasource](https://docs.appsmith.com/reference/datasources/querying-mysql).
+   - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. Happy hacking!
+
+
+
+
+
+### 🐘 PostgreSQL 
+1. Copy the provaider ` docker-compose.yml`[for PostgreSQL](/Postgress/docker-compose.yaml)
+```yaml
+version: '3'
+services:
+  postgres:
+          image: 'postgres:12'
+          restart: always
+          volumes:
+          - './postgres_data:/var/lib/postgresql/data'
+          environment:
+          - POSTGRES_PASSWORD=secure_pass_here
+          ports:
+          - '5432:5432'
+```
+2. Run the deployment.
+``` bash
+docker-compose up -d docker-compose.yaml 
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+```bash
+ngrok tcp 5432
+```
+4. Follow our guide to create a [PostgreSQL](https://docs.appsmith.com/reference/datasources/querying-postgres).
+   - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. Host and port are given by ngrok
+6. Data base name
+`
+postgres
+`
+7. User
+`
+postgres
+`
+8. Password
+`
+secure_pass_here
+`
+9. Happy hacking!
+
+###  🟥 Redis
+
+1. Copy the provaider docker-compose.yml [for Redis](/Redis/docker-compose.yaml).
+```yaml
+version: '2'
+
+services:
+  redis:
+    image: docker.io/bitnami/redis:7.0
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+
+volumes:
+  redis_data:
+    driver: local
+```
+2. Run the deployment.
+```bash
+docker-compose up -d docker-compose.yaml 
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+```bash
+ngrok tcp 6379
+```
+4.  Follow our guide to create a [Redis](https://docs.appsmith.com/reference/datasources/querying-redis).
+    - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. Host and port are given by ngrok
+6. Happy hacking!
+
+###  ElasticSearch
+1. Copy the provaider docker-compose.yml [for ElasticSearch](/ElasticSearch/docker-compose.yaml).
+```yaml
+version: "3.0"
+services:
+  elasticsearch:
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    networks:
+      - es-net
+    ports:
+      - 9200:9200
+  kibana:
+    container_name: kb-container
+    image: docker.elastic.co/kibana/kibana:7.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es-container:9200
+    networks:
+      - es-net
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+networks:
+  es-net:
+    driver: bridge
+```
+
+
+` Note: This installation may take a long time. `
+
+
+2. Run the deployment.
+```bash
+docker-compose up -d docker-compose.yaml 
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command
+```bash 
+ngrok http 9200
+```
+4. Follow our guide to create a  from ElasticSearch [ElasticSearch](https://docs.appsmith.com/reference/datasources/querying-elasticsearch).
+   - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+6. The port for the connection is ` 443 `
+7. Happy hacking!
+
+### SqlServer
+
+1. Copy the provaider docker-compose.yml [for SqlServer](/SqlServer/docker-compose.yaml).
+```yaml
+version: '3.9'
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2017-CU31-ubuntu-18.04
+    ports:
+      - 1433:1433
+    volumes:
+      - ~/apps/mssql/data:/var/lib/mssqlql/data
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=mssql1Ipw
+```
+2. Run the deployment.
+```bash
+docker-compose up -d docker-compose.yaml 
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+```bash
+ngrok tcp 1433 
+```
+4. Follow our guide to create a [SqlServer](https://docs.appsmith.com/reference/datasources/querying-mssql)
+   - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. default database name: ` master `
+6. User Name: `sa`
+7. Password: ` mssql1Ipw `
+8. Happy hacking!
+
+### 📧 SMTP 
+
+1. Copy the provaider docker-compose.yml [for SMTP](/SMTP/docker-compose.yaml)
+```yaml
+version: '3'
+services:
+  mail:
+    image: bytemark/smtp
+    restart: always
+    ports:
+     - "25:25"
+    environment:
+      RELAY_HOST: smtp.gmail.com
+      RELAY_PORT: 587
+      RELAY_USERNAME: appsmith@example.com
+      RELAY_PASSWORD: secretpassword
+```
+2. Run the deployment.
+```bash
+docker-compose up -d docker-compose.yaml
+```
+3.  Open a terminal and create a reachable URL via Ngrok with the following command.
+```bash
+ ngrok tcp 25 
+```
+4. Follow our guide to create a [SMTP](https://docs.appsmith.com/reference/datasources/using-smtp)
+    - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. The password and username are ` admin`
+6. Happy hacking!
+
+### 🥑 ArangoDB
+1. Copy the provaider docker-compose.yml [for ArangoDB](/ArangoDB/docker-compose.yaml)
+```yaml
+version: '3.7'
+services:
+  arangodb_db_container:
+    image: arangodb:3.2.2
+    environment:
+      ARANGO_ROOT_PASSWORD: arangoappsmith
+    ports:
+      - 8529:8529
+```
+2. Run the deployment.
+```bash
+docker-compose up -d docker-compose.yaml 
+```
+3. Open a terminal and create a reachable URL via Ngrok with the following command.
+ ```bash
+ngrok tcp 8529
+```
+4. Follow our guide to create a [ArangoDB](https://docs.appsmith.com/reference/datasources/querying-arango-db)
+   - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+5. Database name:` _system`
+6. User: `root`
+7. Password: `arangoappsmith `

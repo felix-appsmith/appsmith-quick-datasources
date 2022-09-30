@@ -1,0 +1,11 @@
+version: '3'
+services:
+  postgres:
+          image: 'postgres:12'
+          restart: always
+          volumes:
+          - './postgres_data:/var/lib/postgresql/data'
+          environment:
+          - POSTGRES_PASSWORD=secure_pass_here
+          ports:
+          - '5432:5432'
