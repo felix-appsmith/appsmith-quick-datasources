@@ -7,6 +7,7 @@ This project aims to provide fast and easy steps to set up such services so that
 ## Notes
 
 - The deployment instructions provided here are not suited for production use, please use them for testing and POCs only.
+- On linux docker commands must be run as administrator.
 - If you are deploying this on an hosting provider you will need to use `Ngrok` to get a usable URL to connect to. If you use this locally just remember to use `localhost`.
 - Example how to get Ngrok host and port to make connections.
 ```console
@@ -320,3 +321,42 @@ ngrok tcp 8529
 5. Database name:` _system`
 6. User: `root`
 7. Password: `arangoappsmith `
+# Configuring other data sources 
+
+### ➡️DynamoDB
+
+1. Create an aws [account](https://portal.aws.amazon.com/billing/signup#/start/email)
+2. Enter the aws shell whether it is the cloud or the local
+3. copy this command to create a table
+```console
+aws dynamodb create-table --table-name Music --attribute-definitions AttributeName=Artist,AttributeType=S AttributeName=SongTitle,AttributeType=S --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --table-class STANDARD
+```
+4. We will verify that the table is active with the following command
+```console 
+aws dynamodb describe-table --table-name Music | grep TableStatus
+```
+5. Get your access credentials and your region
+6. Follow our guide to create a [DynamoDB](https://docs.appsmith.com/reference/datasources/querying-dynamodb)
+### 🪁 S3
+1. Create an aws [account](https://portal.aws.amazon.com/billing/signup#/start/email)
+2. Enter the aws shell whether it is the cloud or the local
+3. We create an s3 bucket: `aws s3 mb s3://bucket-appsmith `
+4. We list our buckets: `aws s3 ls `
+5.  Follow our guide to create a [S3](https://docs.appsmith.com/reference/datasources/querying-amazon-s3)
+
+### 🔥 Firestore
+
+1. We install [Gcloud](https://cloud.google.com/sdk/docs/install?hl=es-419)
+2. We will follow the following commands.
+3. We create a new project .
+` gcloud projects create appsmithfirestore`
+4. We list the project.
+`gcloud project list `
+5. We select the project
+`gcloud config set project appsmithfirestore `
+6. We create an application
+`gcloud app create `
+7. create the database
+`gcloud firestore databases create --region=us-east1 `
+8. database url ` https://appsmithfirestore.firebaseio.com`
+9 Follow our guide to create a [Firestore](https://docs.appsmith.com/v/v1.2/datasource-reference/querying-firestore)
