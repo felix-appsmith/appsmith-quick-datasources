@@ -107,6 +107,9 @@ ngrok tcp 3306
 ```
 4. Follow our guide to create a [MySQL Datasource](https://docs.appsmith.com/reference/datasources/querying-mysql).
    - Use the URL provided by the Ngrok command as the *host* on your connection settings.
+   
+   `Note: disable the SSL`
+   
 5. Happy hacking!
 
 
@@ -360,3 +363,99 @@ aws dynamodb describe-table --table-name Music | grep TableStatus
 `gcloud firestore databases create --region=us-east1 `
 8. database url ` https://appsmithfirestore.firebaseio.com`
 9 Follow our guide to create a [Firestore](https://docs.appsmith.com/v/v1.2/datasource-reference/querying-firestore)
+
+# Custom MongoDB  in Back-end
+A simple solution with all the steps to follow to connect custom mongoDB to appsmith's sealf-host backend
+
+## Requirements
+
+
+- [Mongo Shell](https://www.mongodb.com/try/download/shell2)
+- [Mongo Compass](https://www.mongodb.com/docs/compass/current/install/)
+
+### 🍃Create the mongo container replica set
+1. We create a network for our mongo
+
+  ```console
+  sudo docker network create mongoNet
+  ```
+  
+2. We create 3 mongo containers on our network
+
+```console 
+sudo docker run -d -p 30001:27017 --net mongoNet --name m1 mongo:6.0.2 --replSet mongoSet
+```
+
+
+```console  
+sudo docker run -d -p 30002:27017 --net mongoNet --name m2 mongo:6.0.2 --replSet mongoSet
+```
+
+
+```console  
+sudo docker run -d -p 30003:27017 --net mongoNet --name m3 mongo:6.0.2 --replSet mongoSet
+```
+
+3. We enter the mongo shell to setup the replica set.
+
+```console
+sudo docker exec -it m1 mongosh
+```
+4. We create the setup.
+
+```console 
+config = { "_id":"mongoSet","members":[{_id:0,host:"m1:27017"},{_id:1,host:"m2:27017"},{_id:2,host:"m3:27017"}]}
+```
+
+5. We start the replica set.
+
+```console
+rs.initiate(config)
+```
+
+`Note: you have to see an ok message`
+
+6. Done mongo set replica container is created.
+
+### 🔗 Connecting mongo set replica to appsmith
+
+1. Connect to the database through mongo compass and create a database called. `appsmith` with the collection `test`
+
+`MongoURI:mongodb://0.0.0.0:30001/?directConnection=true`
+
+2. Make this docker-compose appsmith-host.
+
+```yaml
+version: "3"
+services:
+  appsmith:
+    image: index.docker.io/appsmith/appsmith-ce
+    container_name: appsmith
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./stacks:/appsmith-stacks
+    environment:
+      - APPSMITH_MONGODB_URI=mongodb://youipaddress:30001/appsmith
+    restart: unless-stopped
+```
+MongoURI note:
+
+`mongodb://yourIpaddress:yourPort/Youdatabasename`
+
+3. Get my IP address.
+
+  
+ ```console
+  ifconfig
+  ```
+  
+4. Run docker container.
+
+```console  
+sudo docker-compose up
+```
+
+
+`Note:this document is linux based`
