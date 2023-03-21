@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: appsmith
+      MYSQL_DATABASE: develop
+      MYSQL_USER: appsmith
+      MYSQL_PASSWORD: appsmith
+    volumes:
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+    ports:
+      - 3306:3306

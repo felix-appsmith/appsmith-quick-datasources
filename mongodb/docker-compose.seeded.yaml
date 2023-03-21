@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: appsmith
+      MONGO_INITDB_ROOT_PASSWORD: appsmith
+      MONGO_INITDB_DATABASE: develop
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./seed.js:/docker-entrypoint-initdb.d/seed.js:ro

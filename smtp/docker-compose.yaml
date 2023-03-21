@@ -8,5 +8,5 @@ services:
     environment:
       RELAY_HOST: smtp.gmail.com
       RELAY_PORT: 587
-      RELAY_USERNAME: appsmith@example.com
-      RELAY_PASSWORD: secretpassword
+      RELAY_USERNAME: appsmith
+      RELAY_PASSWORD: appsmith

@@ -6,6 +6,6 @@ services:
           volumes:
           - './postgres_data:/var/lib/postgresql/data'
           environment:
-          - POSTGRES_PASSWORD=secure_pass_here
+          - POSTGRES_PASSWORD=appsmith
           ports:
           - '5432:5432'

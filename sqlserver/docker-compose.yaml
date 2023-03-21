@@ -8,4 +8,4 @@ services:
       - ~/apps/mssql/data:/var/lib/mssqlql/data
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=mssql1Ipw
+      - SA_PASSWORD=appsmith

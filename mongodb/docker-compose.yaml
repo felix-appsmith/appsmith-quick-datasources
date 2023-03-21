@@ -7,7 +7,7 @@ services:
     container_name: appsmithMongo
     hostname: host-appsmith-mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: 
-      MONGO_INITDB_ROOT_PASSWORD: 
+      MONGO_INITDB_ROOT_USERNAME: appsmith
+      MONGO_INITDB_ROOT_PASSWORD: appsmith
     ports:
       - "27017:27017"
