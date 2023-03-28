@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: appsmith
+      POSTGRES_PASSWORD: appsmith
+      POSTGRES_DB: develop
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
