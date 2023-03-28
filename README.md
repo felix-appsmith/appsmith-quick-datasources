@@ -262,12 +262,21 @@ services:
       - ~/apps/mssql/data:/var/lib/mssqlql/data
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=appsmith
+      - SA_PASSWORD=Appsmith1!
 ```
 2. Run the deployment.
 ```bash
 docker-compose up -d docker-compose.yaml 
 ```
+`Note: There is a version that uses a seed, in case you want to test with a DB with data`
+- Navigate to the path sqlserver/seeded
+  ```bash
+  cd sqlserver/seeded
+  ```
+- Run the command.
+  ```
+  docker-compose -f docker-compose.seeded.yaml up -d
+  ```
 3. Open a terminal and create a reachable URL via Ngrok with the following command.
 ```bash
 ngrok tcp 1433 
@@ -275,8 +284,8 @@ ngrok tcp 1433
 4. Follow our guide to create a [SqlServer](https://docs.appsmith.com/reference/datasources/querying-mssql)
    - Use the URL provided by the Ngrok command as the *host* in your connection settings.
 5. default database name: ` master `
-6. Username: `appsmith`
-7. Password: ` appsmith `
+6. Username: `sa`
+7. Password: ` Appsmith1! `
 8. Happy hacking!
 
 ### 📧 SMTP 
