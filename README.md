@@ -338,6 +338,10 @@ services:
 ```bash
 docker-compose up -d docker-compose.yaml 
 ```
+`Note: There is a version that uses a seed, in case you want to test with a DB with data`
+```
+docker-compose -f docker-compose.seeded.yaml up -d
+```
 3. Open a terminal and create a reachable URL via Ngrok with the following command.
  ```bash
 ngrok tcp 8529
