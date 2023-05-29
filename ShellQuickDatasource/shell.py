@@ -46,7 +46,23 @@ Hello, welcome to Appsmith Quick Datasource. The best option for deploying and t
         'mssql': 'cd sqlserver && sudo docker-compose up -d ',
     }
 
-    
+    expose_commands = {
+        'arangodb': 'ngrok tcp 8529 ',
+        'elasticsearch': 'ngrok http 9200 ',
+        'mongodb': 'ngrok tcp 27017 ',
+        'mysql': 'ngrok tcp 3306 ',
+        'postgres': 'ngrok tcp 5432 ',
+        'redis': 'ngrok tcp 6379 ',
+        'smtp': 'ngrok tcp 25 ',
+        'mssql': 'ngrok tcp 1433 ',
+    }
+
+    def do_expose(self,arg):
+        if arg in self.expose_commands:
+           print(F'{Fore.GREEN} Starting ngrok tunnel {arg.capitalize()}')
+           subprocess.run(self.expose_commands[arg], shell=True)
+          
+
     def do_dblists(self, arg):
         subprocess.run('sudo docker ps', shell=True)
 
@@ -65,5 +81,7 @@ Hello, welcome to Appsmith Quick Datasource. The best option for deploying and t
 
     def do_clear(self, arg):
         os.system('cls' if os.name == 'nt' else 'clear')
+
+    
 
     
