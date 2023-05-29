@@ -1,5 +1,6 @@
 import cmd
 from colorama import Fore, Style
+import subprocess
 import os
 class MyShell(cmd.Cmd):
     prompt = f'{Fore.GREEN}>>{Style.RESET_ALL} '
@@ -22,26 +23,46 @@ Hello, welcome to Appsmith Quick Datasource. The best option for deploying and t
     def do_exit(self, arg):
         return True
       
-    def do_mongo(self,arg):
-        print(F'{Fore.GREEN}Mongo Server is starting...')
-    
-    def do_arango(self,arg):
-        print(F'{Fore.GREEN}Arango Server is starting...')
-    
-    def do_elasticsearch(self,arg):
-        print(F'{Fore.GREEN}ElasticSearch Server is starting...')
-
-    def do_mysql(self,arg):
-        print(F'{Fore.GREEN}MySQL Server is starting...')
-    
-    def do_postgres(self,arg):
-        print(F'{Fore.GREEN}Postgres Server is starting...')
-    
-    def do_smtp(self,arg):
-        print(F'{Fore.GREEN}SMTP Server is starting...')
+    stop_commands = {
+        'arangodb': 'cd arangodb && sudo docker-compose down',
+        'elasticsearch': 'cd elasticsearch && sudo docker-compose down',
+        'mongodb': 'cd mongodb && sudo docker-compose down',
+        'mysql': 'cd mysql && sudo docker-compose down',
+        'postgres': 'cd postgress && sudo docker-compose down',
+        'redis': 'cd redis && sudo docker-compose down',
+        'smtp': 'cd smtp && sudo docker-compose down',
+        'mssql': 'cd sqlserver && sudo docker-compose down',
         
-    def do_mssql(self,arg):
-        print(F'{Fore.GREEN}MsSql Server is starting...')
+    }
+
+    start_commands = {
+        'arangodb': 'cd arangodb && sudo docker-compose up -d ',
+        'elasticsearch': 'cd elasticsearch && sudo docker-compose up -d ',
+        'mongodb': 'cd mongodb && sudo docker-compose up -d ',
+        'mysql': 'cd mysql && sudo docker-compose up -d ',
+        'postgres': 'cd postgress && sudo docker-compose up -d ',
+        'redis': 'cd redis && sudo docker-compose up -d ',
+        'smtp': 'cd smtp && sudo docker-compose up -d ',
+        'mssql': 'cd sqlserver && sudo docker-compose up -d ',
+    }
+
+    
+    def do_dblists(self, arg):
+        subprocess.run('sudo docker ps', shell=True)
+
+
+
+    def do_start(self,arg):
+        if arg in self.start_commands:
+            print(F'{Fore.GREEN} {arg.capitalize()} Server is starting...')
+            subprocess.run(self.start_commands[arg], shell=True)
+
+    def do_stop(self,arg):
+        if arg in self.stop_commands:
+            print(F'{Fore.GREEN}Stopping {arg.capitalize()} Server...')
+            subprocess.run(self.stop_commands[arg], shell=True)
+            
+
     def do_clear(self, arg):
         os.system('cls' if os.name == 'nt' else 'clear')
 
