@@ -2,6 +2,8 @@ import cmd
 from colorama import Fore, Style
 import subprocess
 import os
+from ShellServices.ngrokServer import open_server_ngrok
+from colorama import Fore
 class MyShell(cmd.Cmd):
     prompt = f'{Fore.GREEN}>>{Style.RESET_ALL} '
 
@@ -47,21 +49,33 @@ Hello, welcome to Appsmith Quick Datasource. The best option for deploying and t
     }
 
     expose_commands = {
-        'arangodb': 'ngrok tcp 8529 ',
-        'elasticsearch': 'ngrok http 9200 ',
-        'mongodb': 'ngrok tcp 27017 ',
-        'mysql': 'ngrok tcp 3306 ',
-        'postgres': 'ngrok tcp 5432 ',
-        'redis': 'ngrok tcp 6379 ',
-        'smtp': 'ngrok tcp 25 ',
-        'mssql': 'ngrok tcp 1433 ',
+        'arangodb': {'port': 8529, 'protocol': 'tcp',  'db_name': '_system', 'username': 'root', 'password': 'arangoappsmith'},
+        'elasticsearch': {'port': 9200, 'protocol': 'http',  'db_name': 'db', '443': 'root', '443': '443'},
+        'mongodb': {'port': 27017, 'protocol': 'tcp', 'db_name': 'admin', 'username': 'appsmith', 'password': 'appsmith'},
+        'mysql': {'port': 3306, 'protocol': 'tcp', 'db_name': 'db', 'username': 'root', 'password': 'password'},  
+        'postgres': {'port': 5432, 'protocol': 'tcp',  'db_name': 'postgres', 'username': 'postgres', 'password': 'appsmith'},
+        'redis': {'port': 6379, 'protocol': 'tcp',  'db_name': '0', 'username': '', 'password': ''},
+        'smtp': {'port': 25, 'protocol': 'tcp',  'db_name': 'db', 'username': 'appsmith', 'password': 'appsmith'},
+        'mssql': {'port': 1433, 'protocol': 'tcp',  'db_name': 'master', 'username': 'sa', 'password': 'Appsmith1!'},
     }
 
-    def do_expose(self,arg):
+
+
+    def do_expose(self, arg):
         if arg in self.expose_commands:
-           print(F'{Fore.GREEN} Starting ngrok tunnel {arg.capitalize()}')
-           subprocess.run(self.expose_commands[arg], shell=True)
-          
+            print(F'{Fore.GREEN} Starting ngrok tunnel {arg.capitalize()}')
+            url, puerto = open_server_ngrok(self.expose_commands[arg]['port'], self.expose_commands[arg]['protocol'])
+            db_name = self.expose_commands[arg].get('db_name', '')
+            username = self.expose_commands[arg].get('username', '')
+            password = self.expose_commands[arg].get('password', '')
+            host = url.split(':')[0]
+            print(f"Host: {host}")
+            print(f"Port: {puerto}")
+            print(f"Database Name: {db_name}")
+            print(f"Username: {username}")
+            print(f"Password: {password}")
+         
+
 
     def do_dblists(self, arg):
         subprocess.run('sudo docker ps', shell=True)
@@ -77,7 +91,6 @@ Hello, welcome to Appsmith Quick Datasource. The best option for deploying and t
         if arg in self.stop_commands:
             print(F'{Fore.GREEN}Stopping {arg.capitalize()} Server...')
             subprocess.run(self.stop_commands[arg], shell=True)
-            
 
     def do_clear(self, arg):
         os.system('cls' if os.name == 'nt' else 'clear')
